@@ -75,6 +75,9 @@ void semaforo_pedestres() {
     // Em seguida, desligar semáforo dos pedestres e buzzer
     desligar_sinal_verde_pedestre();
     desligarSemaforo(VERMELHO);
+
+    // Recomeçar sequência padrão do semáforo dos carros
+    semaforo_carros();
 }
 
 // Função que espera por um determinado número de segundos ou interrompe se o botão for pressionado
