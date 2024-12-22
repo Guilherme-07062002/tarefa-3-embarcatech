@@ -17,9 +17,6 @@ typedef enum {
 
 // Função para acionar o sinal verde dos pedestres e buzzer com frequência ajustável
 void sinal_verde_pedestre() {
-    const int freq_hz = 10000; // Frequência desejada em Hertz
-    const int duration_ms = 2000; // Duração total em milissegundos
-
     gpio_put(LED_VERDE_PEDRESTES, 1);  // Acende o LED verde para pedestres
     gpio_put(BUZZER, 1);  // Liga o buzzer
 }
@@ -36,13 +33,16 @@ void semaforo_carros() {
     // quando o dos pedestres estiver desligado
     if (!gpio_get(LED_VERDE_PEDRESTES)) {
         ligarSemaforo(VERDE);
-        verificarBotao(4);
+        // O verde fica ligado por 8 segundos
+        verificarBotao(8);
 
+        // O amarelo fica ligado por 2 segundos
         ligarSemaforo(AMARELO);
-        verificarBotao(4);
+        verificarBotao(2);
 
+        // E o vermelgo por 10 segundos
         ligarSemaforo(VERMELHO);
-        verificarBotao(4);
+        verificarBotao(10);
     }
 }
 
@@ -55,13 +55,23 @@ void semaforo_pedestres() {
     desligarSemaforo(AMARELO);
     desligarSemaforo(VERMELHO);
 
-    // Ligar o semáforo amarelo e o verde dos pedestres
+    // Iniciar sequência de fechamento para os carros
+    // O LED amarelo deve ficar acionado por 5 segundos
     ligarSemaforo(AMARELO);
+    sleep_ms(5000);  
+
+    // E depois o vermelho por 15 segundos
+    ligarSemaforo(VERMELHO);
+    sleep_ms(15000);  
+
+    // Ligar semáforo dos pedestres
     sinal_verde_pedestre();
 
-    sleep_ms(4000);  // Pedestre pode atravessar por 4 segundos
+    sleep_ms(15000);  // Pedestre pode atravessar por 15 segundos
+
     // Em seguida, desligar semáforo dos pedestres e buzzer
     desligar_sinal_verde_pedestre();
+    desligarSemaforo(VERMELHO);
 }
 
 // Função que espera por um determinado número de segundos ou interrompe se o botão for pressionado
