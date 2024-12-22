@@ -20,13 +20,13 @@ typedef enum {
 
 // Função para acionar o sinal verde dos pedestres e buzzer com frequência ajustável
 void sinal_verde_pedestre() {
-    ligarSemaforo(LED_VERDE_PEDRESTES);
+    ligarSemaforo(VERDE_PEDESTRES);
     ligarBuzzer();
 }
 
 // Função para desligar o sinal verde dos pedestres e buzzer
 void desligar_sinal_verde_pedestre() {
-    desligarSemaforo(LED_VERDE_PEDRESTES);
+    desligarSemaforo(VERDE_PEDESTRES);
     desligarBuzzer();
 }
 
@@ -82,7 +82,7 @@ void verificarBotao(int segundos) {
     for (int i = 0; i < segundos; i++) {
         sleep_ms(1000);  // Espera 1 segundo
         if (gpio_get(BOTAO) == 0) {  // Verifica se o botão foi pressionado
-            return;  // Sai da função imediatamente
+            semaforo_pedestres();
         }
     }
 }
@@ -115,7 +115,6 @@ void ligarSemaforo(CorSemaforo cor) {
 
 // Função para desligar o semáforo de acordo com a cor especificada
 void desligarSemaforo(CorSemaforo cor) {
-    // Desliga o LED correspondente
     switch (cor) {
         case VERDE:
             gpio_put(LED_VERDE, 0);
