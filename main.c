@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include "pico/stdlib.h"
+#include "hardware/gpio.h"
+#include "hardware/pwm.h"
 
 #define LED_VERMELHO 15
 #define LED_AMARELO 14
@@ -12,19 +14,20 @@
 typedef enum {
     VERDE,
     AMARELO,
-    VERMELHO
+    VERMELHO,
+    VERDE_PEDESTRES
 } CorSemaforo;
 
 // Função para acionar o sinal verde dos pedestres e buzzer com frequência ajustável
 void sinal_verde_pedestre() {
-    gpio_put(LED_VERDE_PEDRESTES, 1);  // Acende o LED verde para pedestres
-    gpio_put(BUZZER, 1);  // Liga o buzzer
+    ligarSemaforo(LED_VERDE_PEDRESTES);
+    ligarBuzzer();
 }
 
 // Função para desligar o sinal verde dos pedestres e buzzer
 void desligar_sinal_verde_pedestre() {
-    gpio_put(LED_VERDE_PEDRESTES, 0);  // Desliga o LED verde para pedestres
-    gpio_put(BUZZER, 0);               // Desliga o buzzer
+    desligarSemaforo(LED_VERDE_PEDRESTES);
+    desligarBuzzer();
 }
 
 // Função para alternar o semáforo de carros
@@ -102,6 +105,9 @@ void ligarSemaforo(CorSemaforo cor) {
         case VERMELHO:
             gpio_put(LED_VERMELHO, 1);
             break;
+        case VERDE_PEDESTRES:
+            gpio_put(LED_VERDE_PEDRESTES, 1);
+            break;
         default:
             printf("Cor inválida\n");
     }
@@ -120,9 +126,25 @@ void desligarSemaforo(CorSemaforo cor) {
         case VERMELHO:
             gpio_put(LED_VERMELHO, 0);
             break;
+        case VERDE_PEDESTRES:
+            gpio_put(LED_VERDE_PEDRESTES, 0);
+            break;
         default:
             printf("Cor inválida\n");
     }
+}
+
+void ligarBuzzer() {
+    gpio_set_function(BUZZER, GPIO_FUNC_PWM);
+    uint slice_num = pwm_gpio_to_slice_num(BUZZER);
+    pwm_set_clkdiv(slice_num, 500);  // Ajuste o clock para alcançar a frequência
+    pwm_set_wrap(slice_num, 2500);      // Definindo o valor de "wrap"
+    pwm_set_gpio_level(BUZZER, 500); // Definindo o ciclo de trabalho para o buzzer tocar
+    pwm_set_enabled(slice_num, true);   // Habilita o PWM
+}
+
+void desligarBuzzer() {
+    pwm_set_enabled(pwm_gpio_to_slice_num(BUZZER), false); // Desliga o PWM
 }
 
 // Função para executar a inicialização dos pinos do circuito
